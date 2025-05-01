@@ -17,6 +17,7 @@ build/
 Debug/
 Release/
 *_build/
+*.ninja_log
 
 # Eclipse IDE for ModusToolbox files. Comment those files if you want to track them
 # KrIsKa7a: Commented out to enable easier project run at different devices during development. Will be commneted in the final deployment.
