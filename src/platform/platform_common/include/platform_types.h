@@ -44,26 +44,35 @@ typedef nw_bool NwGpioPinResult;
 
 typedef enum eNexaWattGPIOPinDriveMode
 {
-    NW_GPIO_DM_ANALOG,
-    NW_GPIO_DM_STRONG_PP,
-    NW_GPIO_DM_PULL_UP,
-    NW_GPIO_DM_PULL_DOWN,
-    NW_GPIO_DM_OPEN_DRAIN,
-    NW_GPIO_DM_HIGH_Z,
+    NW_GPIO_DM_ANALOG       = 0x01u,
+    NW_GPIO_DM_STRONG_PP    = 0x02u,
+    NW_GPIO_DM_PULL_UP      = 0x03u,
+    NW_GPIO_DM_PULL_DOWN    = 0x04u,
+    NW_GPIO_DM_OPEN_DRAIN   = 0x05u,
+    NW_GPIO_DM_HIGH_Z       = 0x06u,
 } NexaWattGPIOPinDriveMode;
 
 typedef enum eNexaWattGPIOPinDriveSpeed
 {
-    NW_GPIO_DS_FAST,
-    NW_GPIO_DS_SLOW,
+    NW_GPIO_DS_FAST = 0x01u,
+    NW_GPIO_DS_SLOW = 0x02u,
 } NexaWattGPIOPinDriveSpeed;
 
 typedef enum eNexaWattGPIOPinDriveStrength
 {
-    NW_GPIO_DSTR_FULL,
-    NW_GPIO_DSTR_HALF,
-    NW_GPIO_DSTR_QUARTER
+    NW_GPIO_DSTR_FULL       = 0x01u,
+    NW_GPIO_DSTR_HALF       = 0x02u,
+    NW_GPIO_DSTR_QUARTER    = 0x03u,
 } NexaWattGPIOPinDriveStrength;
+
+typedef enum eNexaWattGPIOPinAltFunction
+{
+    NW_GPIO_ALT_DIGITAL_IO      = 0x01u,
+    NW_GPIO_ALT_ANALOG_INPUT    = 0x02u,
+    NW_GPIO_ALT_PWM             = 0x03u,
+    NW_GPIO_ALT_UART_RX         = 0x04u,
+    NW_GPIO_ALT_UART_TX         = 0x05u
+} NexaWattGPIOPinAltFunction;
 
 typedef struct sNexaWattGPIOPinConfig
 {
@@ -71,6 +80,7 @@ typedef struct sNexaWattGPIOPinConfig
     NexaWattGPIOPinDriveMode driveMode;
     NexaWattGPIOPinDriveSpeed driveSpeed;
     NexaWattGPIOPinDriveStrength driveStrength;
+    NexaWattGPIOPinAltFunction altFunction;
 } NexaWattGPIOPinConfig;
 
 typedef enum eNexaWattGPIOStatusResult
