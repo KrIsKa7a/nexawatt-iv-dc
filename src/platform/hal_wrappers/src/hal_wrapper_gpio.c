@@ -39,6 +39,11 @@ NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Init_Digital_Pin(uint8 portNum,
     return NW_GPIO_FATAL_ERR;
 }
 
+NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Set_Pin_Alt_Functions(uint8 portNum, uint8 pinNum, NwGpioPinAltFunction altFunction)
+{
+    return NW_GPIO_FATAL_ERR;
+}
+
 NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_DeInit_Port(uint8 portNum)
 {
     return NW_GPIO_FATAL_ERR;

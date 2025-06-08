@@ -42,6 +42,7 @@ typedef int64_t int64;
 
 typedef uint8_t nw_bool;
 typedef nw_bool NwGpioPinResult;
+typedef uint16 NwGpioPinAltFunction;
 
 typedef enum eNexaWattGPIOPinDirection
 {
@@ -73,23 +74,14 @@ typedef enum eNexaWattGPIOPinDriveStrength
     NW_GPIO_DSTR_QUARTER    = 0x02u,
 } NexaWattGPIOPinDriveStrength;
 
-typedef enum eNexaWattGPIOPinAltFunction
-{
-    NW_GPIO_ALT_DIGITAL_IO      = 0x00u,
-    NW_GPIO_ALT_ANALOG_INPUT    = 0x01u,
-    NW_GPIO_ALT_PWM             = 0x02u,
-    NW_GPIO_ALT_UART_RX         = 0x03u,
-    NW_GPIO_ALT_UART_TX         = 0x04u
-} NexaWattGPIOPinAltFunction;
-
 typedef struct sNexaWattGPIOPinConfig
 {
     nw_bool initVal;
+    NwGpioPinAltFunction altFunction;
     NexaWattGPIOPinDirection direction;
     NexaWattGPIOPinDriveMode driveMode;
     NexaWattGPIOPinDriveSpeed driveSpeed;
     NexaWattGPIOPinDriveStrength driveStrength;
-    NexaWattGPIOPinAltFunction altFunction;
 } NexaWattGPIOPinConfig;
 
 typedef enum eNexaWattGPIOStatusResult
