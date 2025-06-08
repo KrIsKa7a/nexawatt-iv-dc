@@ -34,42 +34,42 @@
 /*******************************************************************************
 * Function Definitions
 *******************************************************************************/
-NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Init_Digital_Pin(uint8 portNum, uint8 pinNum, const NexaWattGPIOPinConfig* const pinConfig)
+NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Init_Digital_Pin(const uint8 portNum, const uint8 pinNum, const NexaWattGPIOPinConfig* const pinConfig)
 {
     return NW_GPIO_FATAL_ERR;
 }
 
-NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Set_Pin_Alt_Functions(uint8 portNum, uint8 pinNum, NwGpioPinAltFunction altFunction)
+NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Set_Pin_Alt_Functions(const uint8 portNum, const uint8 pinNum, const NwGpioPinAltFunction altFunction)
 {
     return NW_GPIO_FATAL_ERR;
 }
 
-NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_DeInit_Port(uint8 portNum)
+NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_DeInit_Port(const uint8 portNum)
 {
     return NW_GPIO_FATAL_ERR;
 }
 
-NwGpioPinResult NexaWatt_HalWrapperGpio_Pin_Read(uint8 portNum, uint8 pinNum)
+NwGpioPinResult NexaWatt_HalWrapperGpio_Pin_Read(const uint8 portNum, const uint8 pinNum)
 {
     return 0u;
 }
 
-NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Pin_Write(uint8 portNum, uint8 pinNum, nw_bool value)
+NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Pin_Write(const uint8 portNum, const uint8 pinNum, const nw_bool value)
 {
     return NW_GPIO_FATAL_ERR;
 }
 
-NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Pin_Toggle(uint8 portNum, uint8 pinNum)
+NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Pin_Toggle(const uint8 portNum, const uint8 pinNum)
 {
     return NW_GPIO_FATAL_ERR;
 }
 
-NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Register_EXTI(uint8 portNum, uint8 pinNum, NexaWattGPIOInterruptEdgeEXTI intrEdge, void (*isrHandlerPtr)(void))
+NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Register_EXTI(const uint8 portNum, const uint8 pinNum, const NexaWattGPIOInterruptEdgeEXTI intrEdge, void (*const isrHandlerPtr)(void))
 {
     return NW_GPIO_FATAL_ERR;
 }
 
-NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Trigger_Sw_EXTI(uint8 portNum, uint8 pinNum)
+NexaWattGPIOStatusResult NexaWatt_HalWrapperGpio_Trigger_Sw_EXTI(const uint8 portNum, const uint8 pinNum)
 {
     return NW_GPIO_FATAL_ERR;
 }
