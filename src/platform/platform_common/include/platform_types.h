@@ -21,6 +21,7 @@
 * Macros
 *******************************************************************************/
 #define NW_INLINE           inline
+#define NW_LOCAL_INLINE     static inline
 
 #define nwFalse             (0u != 0u)
 #define nwTrue              (0u == 0u)
@@ -42,41 +43,49 @@ typedef int64_t int64;
 typedef uint8_t nw_bool;
 typedef nw_bool NwGpioPinResult;
 
+typedef enum eNexaWattGPIOPinDirection
+{
+    NW_GPIO_INPUT   = 0x01u,
+    NW_GPIO_OUTPUT  = 0x02u,
+} NexaWattGPIOPinDirection;
+
 typedef enum eNexaWattGPIOPinDriveMode
 {
-    NW_GPIO_DM_ANALOG       = 0x01u,
-    NW_GPIO_DM_STRONG_PP    = 0x02u,
-    NW_GPIO_DM_PULL_UP      = 0x03u,
-    NW_GPIO_DM_PULL_DOWN    = 0x04u,
-    NW_GPIO_DM_OPEN_DRAIN   = 0x05u,
-    NW_GPIO_DM_HIGH_Z       = 0x06u,
+    NW_GPIO_DM_STRONG_PP        = 0x00u,
+    NW_GPIO_DM_PULL_UP          = 0x01u,
+    NW_GPIO_DM_PULL_DOWN        = 0x02u,
+    NW_GPIO_DM_OPEN_DRAIN_DL    = 0x03u,
+    NW_GPIO_DM_OPEN_DRAIN_DH    = 0x04u,
+    NW_GPIO_DM_HIGH_Z           = 0x05u,
+    NW_GPIO_DM_ANALOG           = 0x06u,
 } NexaWattGPIOPinDriveMode;
 
 typedef enum eNexaWattGPIOPinDriveSpeed
 {
-    NW_GPIO_DS_FAST = 0x01u,
-    NW_GPIO_DS_SLOW = 0x02u,
+    NW_GPIO_DS_FAST = 0x00u,
+    NW_GPIO_DS_SLOW = 0x01u,
 } NexaWattGPIOPinDriveSpeed;
 
 typedef enum eNexaWattGPIOPinDriveStrength
 {
-    NW_GPIO_DSTR_FULL       = 0x01u,
-    NW_GPIO_DSTR_HALF       = 0x02u,
-    NW_GPIO_DSTR_QUARTER    = 0x03u,
+    NW_GPIO_DSTR_FULL       = 0x00u,
+    NW_GPIO_DSTR_HALF       = 0x01u,
+    NW_GPIO_DSTR_QUARTER    = 0x02u,
 } NexaWattGPIOPinDriveStrength;
 
 typedef enum eNexaWattGPIOPinAltFunction
 {
-    NW_GPIO_ALT_DIGITAL_IO      = 0x01u,
-    NW_GPIO_ALT_ANALOG_INPUT    = 0x02u,
-    NW_GPIO_ALT_PWM             = 0x03u,
-    NW_GPIO_ALT_UART_RX         = 0x04u,
-    NW_GPIO_ALT_UART_TX         = 0x05u
+    NW_GPIO_ALT_DIGITAL_IO      = 0x00u,
+    NW_GPIO_ALT_ANALOG_INPUT    = 0x01u,
+    NW_GPIO_ALT_PWM             = 0x02u,
+    NW_GPIO_ALT_UART_RX         = 0x03u,
+    NW_GPIO_ALT_UART_TX         = 0x04u
 } NexaWattGPIOPinAltFunction;
 
 typedef struct sNexaWattGPIOPinConfig
 {
     nw_bool initVal;
+    NexaWattGPIOPinDirection direction;
     NexaWattGPIOPinDriveMode driveMode;
     NexaWattGPIOPinDriveSpeed driveSpeed;
     NexaWattGPIOPinDriveStrength driveStrength;
