@@ -1,37 +1,31 @@
 /*******************************************************************************
-* File Name:   hal_context.h
+* File Name:   hal_context_bind.h
 *
 * Description: This is the header file containing declarations and definitions,
-* related to the HAL Context of the NexaWatt-IV.DC framework. The context is
-* responsible for the storage of framework pre-defined/user-defines HAL functions.
+* related to the HAL Context Bind contract of the NexaWatt-IV.DC framework.
+* The context is responsible for the storage of framework pre-defined/user-defines HAL functions.
+* This header file is intended to provide the Bind contract of the HAL Context software component
+* and limit the access to the bind context for the corresponding software component users.
 *
 * Related Document: See README.md
 *
 *******************************************************************************/
 
-#ifndef NEXAWATT_IV_DC_HAL_CONTEXT_H
-#define NEXAWATT_IV_DC_HAL_CONTEXT_H
+#ifndef NEXAWATT_IV_DC_HAL_CONTEXT_BIND_H
+#define NEXAWATT_IV_DC_HAL_CONTEXT_BIND_H
 
 /*******************************************************************************
 * Header Files
 *******************************************************************************/
-#include "platform_types.h"
+#include "hal_context.h"
 
 /*******************************************************************************
 * Macros
 *******************************************************************************/
-#define NW_HAL_CONTEXT_MAX_INIT_FUNCTIONS       (32u)
-#define NW_HAL_CONTEXT_MAX_FUNCTIONS            (255u)
 
 /*******************************************************************************
 * Type definitions
 *******************************************************************************/
-typedef struct sNexaWattHalContextFunction
-{
-    void (*fncCallout)(void);
-    void* fncPtr;
-    void (*fncCallback)(void);
-} NexaWattHalContextFunction;
 
 /*******************************************************************************
 * Global Variables
@@ -40,7 +34,9 @@ typedef struct sNexaWattHalContextFunction
 /*******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-void NexaWatt_HalContext_Init(void);
+
+NexaWattHalContextStatusResult NexaWatt_HalContext_Bind_Init_Function(NexaWattHalContextInitFunctionTypes initFunctionType, const NexaWattHalContextFunction* halContextFncPtr);
+NexaWattHalContextStatusResult NexaWatt_HalContext_Bind_Function(NexaWattHalContextFunctionTypes functionType, const NexaWattHalContextFunction* halContextFncPtr);
 
 /*******************************************************************************
 * Function Definitions
