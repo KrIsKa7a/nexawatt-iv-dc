@@ -42,6 +42,17 @@
  */
 #define NW_HAL_INFINEON_CAT1B_GPIO_INTR_DISABLED_MASK  (0x00u)
 
+/**
+ * \brief Macro returning the corresponding GPIO port base to a provided GPIO port number.
+ */
+#define NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum) \
+    (gpioPortBases[portNum])
+
+/**
+ * \brief Macro performing a calculation of the corresponding interrupt mask to a GPIO pin.
+ */
+#define NW_HAL_INFINEON_CAT1B_GPIO_GET_PIN_INTR_MASK(pinNum) \
+    (0x01u << pinNum)
 /*******************************************************************************
 * Type definitions
 *******************************************************************************/
@@ -161,7 +172,7 @@ NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Init_Digital_Pin(const
         userPinConfig.vohSel = NW_HAL_INFINEON_CAT1B_GPIO_SIO_REG_DEF_VAL;
         userPinConfig.nonSec = NW_HAL_INFINEON_CAT1B_GPIO_SIO_REG_DEF_VAL;
 
-        gpioInitRes = Cy_GPIO_Pin_Init(gpioPortBases[portNum], pinNum, &userPinConfig);
+        gpioInitRes = Cy_GPIO_Pin_Init(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum, &userPinConfig);
         if (gpioInitRes == CY_GPIO_SUCCESS)
         {
             retRes = NW_GPIO_SUCCESS;
@@ -179,7 +190,7 @@ NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Set_Pin_Alt_Functions(
             NexaWatt_Hal_Infineon_Cat1B_Gpio_Validate_Port_And_Pin(portNum, pinNum);
     if (gpioPinExists == nwTrue)
     {
-        Cy_GPIO_SetHSIOM(gpioPortBases[portNum], pinNum, altFunction);
+        Cy_GPIO_SetHSIOM(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum, altFunction);
 
         retRes = NW_GPIO_SUCCESS;
     }
@@ -195,7 +206,7 @@ NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_DeInit_Port(const uint
             NexaWatt_Hal_Infineon_Cat1B_Gpio_Validate_Port_And_Pin(portNum, NW_HAL_INFINEON_CAT1B_GPIO_SIO_REG_DEF_VAL);
     if (gpioPinExists == nwTrue)
     {
-        Cy_GPIO_Port_Deinit(gpioPortBases[portNum]);
+        Cy_GPIO_Port_Deinit(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum));
 
         retRes = NW_GPIO_SUCCESS;
     }
@@ -205,7 +216,22 @@ NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_DeInit_Port(const uint
 
 NwGpioPinResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Pin_Read(const uint8 portNum, const uint8 pinNum)
 {
-    return NW_HAL_INFINEON_CAT1B_GPIO_SIO_REG_DEF_VAL;
+    NwGpioPinResult pinRes = nwFalse;
+    uint32 gpioPinRegRes = 0u;
+
+    nw_bool gpioPinExists =
+            NexaWatt_Hal_Infineon_Cat1B_Gpio_Validate_Port_And_Pin(portNum, pinNum);
+    if (gpioPinExists == nwTrue)
+    {
+        // Defensive programming in case the PDL returns unexpected value that can't be safely cast
+        gpioPinRegRes = Cy_GPIO_Read(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum);
+        if (gpioPinRegRes == 1)
+        {
+            pinRes = nwTrue;
+        }
+    }
+
+    return pinRes;
 }
 
 NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Pin_Write(const uint8 portNum, const uint8 pinNum, const nw_bool value)
@@ -216,7 +242,7 @@ NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Pin_Write(const uint8 
             NexaWatt_Hal_Infineon_Cat1B_Gpio_Validate_Port_And_Pin(portNum, pinNum);
     if (gpioPinExists == nwTrue)
     {
-        Cy_GPIO_Write(gpioPortBases[portNum], pinNum, ((uint32)value));
+        Cy_GPIO_Write(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum, ((uint32)value));
 
         retRes = NW_GPIO_SUCCESS;
     }
@@ -226,7 +252,18 @@ NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Pin_Write(const uint8 
 
 NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Pin_Toggle(const uint8 portNum, const uint8 pinNum)
 {
-    return NW_GPIO_FATAL_ERR;
+    NexaWattGPIOStatusResult retRes = NW_GPIO_BAD_PARAM;
+
+    nw_bool gpioPinExists =
+            NexaWatt_Hal_Infineon_Cat1B_Gpio_Validate_Port_And_Pin(portNum, pinNum);
+    if (gpioPinExists == nwTrue)
+    {
+        Cy_GPIO_Inv(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum);
+
+        retRes = NW_GPIO_SUCCESS;
+    }
+
+    return retRes;
 }
 
 NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Register_EXTI(const uint8 portNum, const uint8 pinNum, const NexaWattGPIOInterruptEdgeEXTI intrEdge, void (*const isrHandlerPtr)(void))
@@ -236,7 +273,23 @@ NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Register_EXTI(const ui
 
 NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Trigger_Sw_EXTI(const uint8 portNum, const uint8 pinNum)
 {
-    return NW_GPIO_FATAL_ERR;
+    NexaWattGPIOStatusResult retRes = NW_GPIO_BAD_PARAM;
+    NwInterruptMask gpioPortIntrMask = NW_HAL_INFINEON_CAT1B_GPIO_INTR_DISABLED_MASK;
+
+    nw_bool gpioPinExists =
+            NexaWatt_Hal_Infineon_Cat1B_Gpio_Validate_Port_And_Pin(portNum, pinNum);
+    if (gpioPinExists == nwTrue)
+    {
+        gpioPortIntrMask = Cy_GPIO_GetInterruptMask(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum);
+        if ((gpioPortIntrMask & NW_HAL_INFINEON_CAT1B_GPIO_GET_PIN_INTR_MASK(pinNum)) != NW_HAL_INFINEON_CAT1B_GPIO_INTR_DISABLED_MASK)
+        {
+            Cy_GPIO_SetSwInterrupt(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum);
+
+            retRes = NW_GPIO_SUCCESS;
+        }
+    }
+
+    return retRes;
 }
 
 NW_LOCAL_INLINE nw_bool NexaWatt_Hal_Infineon_Cat1B_Gpio_Validate_User_Pin_Config(const uint8 portNum, const uint8 pinNum, const NexaWattGPIOPinConfig* const pinConfig)

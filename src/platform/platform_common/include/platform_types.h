@@ -43,6 +43,7 @@ typedef int64_t int64;
 typedef uint8_t nw_bool;
 typedef nw_bool NwGpioPinResult;
 typedef uint16 NwGpioPinAltFunction;
+typedef uint32 NwInterruptMask;
 
 typedef enum eNexaWattGPIOPinDirection
 {

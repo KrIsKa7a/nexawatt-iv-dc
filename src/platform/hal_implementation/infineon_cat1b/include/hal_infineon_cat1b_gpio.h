@@ -72,6 +72,16 @@ NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Set_Pin_Alt_Functions(
  */
 NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_DeInit_Port(uint8 portNum);
 
+/**
+ * HAL function that can be used to read a digital value (true or false) from already configured
+ * GPIO pin. The function performs a validation for the existence of the provided combination of GPIO port and pin numbers for Infineon CAT1B devices.
+ * The input register of the GPIO port is being read and the value at the bit number, corresponding to the provided pin number is returned by the function.
+ * \param portNum - The number of the desired GPIO port for the write.
+ * \param pinNum - The number of the desired GPIO pin for the write.
+ * \return nwFalse - The value in the input register corresponding to the provided pin number is 0.
+ * Note that this value is also returned in case of non-existing combination of port and pin numbers or improperly configured input pin.
+ * \return nwTrue - The value in the input register corresponding to the provided pin number is 1.
+ */
 NwGpioPinResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Pin_Read(uint8 portNum, uint8 pinNum);
 
 /**
@@ -85,9 +95,29 @@ NwGpioPinResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Pin_Read(uint8 portNum, uint8 p
  * \return NW_GPIO_SUCCESS - The provided value is written in the output register of the provided GPIO port.
  */
 NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Pin_Write(uint8 portNum, uint8 pinNum, nw_bool value);
+
+/**
+ * \brief HAL function that can be used to toggle an already configured
+ * GPIO pin. The function performs a validation for the existence of the provided combination of GPIO port and pin numbers for Infineon CAT1B devices.
+ * \param portNum - The number of the desired GPIO port for the operation.
+ * \param pinNum - The number of the desired GPIO pin to be toggled.
+ * \return NW_GPIO_BAD_PARAM - The provided combination of port and pin number does not exist for the Infineon CAT1B device.
+ * \return NW_GPIO_SUCCESS - The GPIO pin output is toggled.
+ */
 NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Pin_Toggle(uint8 portNum, uint8 pinNum);
 
 NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Register_EXTI(uint8 portNum, uint8 pinNum, NexaWattGPIOInterruptEdgeEXTI intrEdge, void (*isrHandlerPtr)(void));
+
+/**
+ * \brief HAL function that can be used to perform SW triggering of an already
+ * configured EXTI (External Interrupt Request). The function performs a validation for the existence of the provided combination of GPIO port and pin numbers for Infineon CAT1B devices.
+ * The correctness of the configured interrupt mask in the GPIO Interrupt Mask registers is also validated. If the combination of GPIO port and pin numbers exists
+ * and the interrupt mask is allowing the interrupt request on the corresponding pin, then an interrupt request will be raised to test the implemented ISR.
+ * \param portNum - The number of the desired GPIO port for the operation.
+ * \param pinNum - The number of the GPIO pin, whose EXTI capabilities will be tested.
+ * \return NW_GPIO_BAD_PARAM - The provided combination of port and pin number does not exist for the Infineon CAT1B device or the configured interrupt mask of the GPIO port restricts the interrupt requests on the provided pin number. Please investigate the GPIO configuration.
+ * \return NW_GPIO_SUCCESS - An IRQ is triggered for the provided pin number on the provided GPIO port number.
+ */
 NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Trigger_Sw_EXTI(uint8 portNum, uint8 pinNum);
 
 /*******************************************************************************
