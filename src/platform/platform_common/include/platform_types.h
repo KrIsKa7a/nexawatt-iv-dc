@@ -100,19 +100,6 @@ typedef enum eNexaWattGPIOInterruptEdgeEXTI
     NW_EXTI_BOTH_EDGES      = 0x03u,
 } NexaWattGPIOInterruptEdgeEXTI;
 
-typedef enum eNexaWattIntrInitStatus
-{
-    NW_HAL_INTR_INIT_SUCCESS = 0x00u,
-    NW_HAL_INTR_INIT_FAILED = 0x01u,
-} NexaWattIntrInitStatus;
-
-typedef struct sNexaWattIntrInitConfig
-{
-    uint32 intrSource;
-    uint32 intrPriority;
-    NwIsrPointerType intrHandlerPtr;
-} NexaWattIntrInitConfig;
-
 typedef enum eNexaWattHalContextInitFunctionTypes
 {
     NW_HAL_BSP_INIT                     = 0u,
