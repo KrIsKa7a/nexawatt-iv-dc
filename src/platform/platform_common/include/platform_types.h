@@ -41,7 +41,9 @@ typedef int64_t int64;
 typedef uint8_t nw_bool;
 typedef nw_bool NwGpioPinResult;
 typedef uint16 NwGpioPinAltFunction;
+typedef nw_bool NwGpioExtiStatus;
 typedef uint32 NwInterruptMask;
+typedef uint32 NwInterruptPriority;
 
 typedef void(*NwIsrPointerType)(void);
 
@@ -100,6 +102,13 @@ typedef enum eNexaWattGPIOInterruptEdgeEXTI
     NW_EXTI_BOTH_EDGES      = 0x03u,
 } NexaWattGPIOInterruptEdgeEXTI;
 
+typedef struct sNexaWattGPIOExtIRQConfig
+{
+    NexaWattGPIOInterruptEdgeEXTI intrEdge;
+    NwInterruptPriority intrPriority;
+    NwIsrPointerType isrHandlerPtr;
+} NexaWattGPIOExtIRQConfig;
+
 typedef enum eNexaWattHalContextInitFunctionTypes
 {
     NW_HAL_BSP_INIT                     = 0u,
@@ -113,8 +122,12 @@ typedef enum eNexaWattHalContextFunctionTypes
     NW_HAL_GPIO_PIN_READ        = 0u,
     NW_HAL_GPIO_PIN_WRITE       = 1u,
     NW_HAL_GPIO_PIN_TOGGLE      = 2u,
-    NW_HAL_GPIO_REGISTER_EXTI   = 3u,
-    NW_HAL_GPIO_TRIGGER_SW_INTR = 4u,
+    NW_HAL_GPIO_PIN_SET_ALT_FNC = 3u,
+    NW_HAL_GPIO_REGISTER_EXTI   = 4u,
+    NW_HAL_GPIO_DISABLE_EXTI    = 5u,
+    NW_HAL_GPIO_GET_EXTI_STAT   = 6u,
+    NW_HAL_GPIO_CLEAR_EXTI_STAT = 7u,
+    NW_HAL_GPIO_TRIGGER_SW_INTR = 8u,
     NW_HAL_FUNC_INVALID         = 255u,
 } NexaWattHalContextFunctionTypes;
 

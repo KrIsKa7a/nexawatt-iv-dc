@@ -41,7 +41,7 @@ typedef enum eNexaWattIntrInitStatus
 typedef struct sNexaWattIntrInitConfig
 {
     uint32 intrSource;
-    uint32 intrPriority;
+    NwInterruptPriority intrPriority;
     NwIsrPointerType intrHandlerPtr;
 } NexaWattIntrInitConfig;
 
@@ -66,7 +66,7 @@ typedef struct sNexaWattIntrInitConfig
  * \return NW_HAL_INTR_INIT_SUCCESS - The provided System Interrupt initialization was successful. The System Interrupt can now safely be
  * enabled either using the CMSIS or the HAL enable functions.
  */
-NexaWattIntrInitStatus NexaWatt_Hal_Infineon_Cat1B_Intr_Init(NexaWattIntrInitConfig* intrConfig);
+NexaWattIntrInitStatus NexaWatt_Hal_Infineon_Cat1B_Intr_Init(const NexaWattIntrInitConfig* intrConfig);
 
 /**
  * \brief HAL function that provides enabling of the System Interrupt using the framework standardized
@@ -76,7 +76,7 @@ NexaWattIntrInitStatus NexaWatt_Hal_Infineon_Cat1B_Intr_Init(NexaWattIntrInitCon
  * the function will silently enable the System Interrupt Source, but the ISR handler will not be working properly!
  * \param intrConfig - A pointer, containing the framework's standardized System Interrupt configuration structure.
  */
-void NexaWatt_Hal_Infineon_Cat1B_Intr_Enable(NexaWattIntrInitConfig* intrConfig);
+void NexaWatt_Hal_Infineon_Cat1B_Intr_Enable(const NexaWattIntrInitConfig* intrConfig);
 
 /**
  * \brief HAL function that provides disabling of the System Interrupt using the framework standardized
@@ -86,7 +86,7 @@ void NexaWatt_Hal_Infineon_Cat1B_Intr_Enable(NexaWattIntrInitConfig* intrConfig)
  * the function will silently disable the System Interrupt Source.
  * \param intrConfig - A pointer, containing the framework's standardized System Interrupt configuration structure.
  */
-void NexaWatt_Hal_Infineon_Cat1B_Intr_Disable(NexaWattIntrInitConfig* intrConfig);
+void NexaWatt_Hal_Infineon_Cat1B_Intr_Disable(const NexaWattIntrInitConfig* intrConfig);
 
 /*******************************************************************************
 * Function Definitions

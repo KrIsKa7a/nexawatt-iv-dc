@@ -1,5 +1,5 @@
 /*******************************************************************************
-* File Name:   hal_infineon_cat1b_gpio.h
+* File Name:   hal_infineon_cat1b_gpio.c
 *
 * Description: This is the source file containing the implementation of the HAL
 * for the GPIO peripheral of the Infineon CAT1B devices.
@@ -17,6 +17,7 @@
 * Header Files
 *******************************************************************************/
 #include "hal_infineon_cat1b_gpio.h"
+#include "hal_infineon_cat1b_intr.h"
 #include "cy_gpio.h"
 
 /*******************************************************************************
@@ -43,6 +44,11 @@
 #define NW_HAL_INFINEON_CAT1B_GPIO_INTR_DISABLED_MASK  (0x00u)
 
 /**
+ * \brief Interrupt mask enabling an EXTI request on a GPIO port's pin.
+ */
+#define NW_HAL_INFINEON_CAT1B_GPIO_INTR_ENABLED_MASK   (0x01u)
+
+/**
  * \brief Macro returning the corresponding GPIO port base to a provided GPIO port number.
  */
 #define NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum) \
@@ -53,6 +59,13 @@
  */
 #define NW_HAL_INFINEON_CAT1B_GPIO_GET_PIN_INTR_MASK(pinNum) \
     (0x01u << pinNum)
+
+/**
+ * \brief Macro returning the GPIO System Interrupt Source Number corresponding  to a provided GPIO port number.
+ */
+#define NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_INTR_SRC(portNum) \
+    (interruptSourcesGpioMap[portNum])
+
 /*******************************************************************************
 * Type definitions
 *******************************************************************************/
@@ -107,9 +120,32 @@ static uint32 outputDriveModesMap[] =
     CY_GPIO_DM_HIGHZ,
 };
 
+static uint32 interruptEdgeMap[] =
+{
+    CY_GPIO_INTR_DISABLE,
+    CY_GPIO_INTR_RISING,
+    CY_GPIO_INTR_FALLING,
+    CY_GPIO_INTR_BOTH,
+};
+
+static uint32 interruptSourcesGpioMap[] =
+{
+    ioss_interrupts_sec_gpio_0_IRQn,
+    ioss_interrupts_sec_gpio_1_IRQn,
+    ioss_interrupts_sec_gpio_2_IRQn,
+    ioss_interrupts_sec_gpio_3_IRQn,
+    ioss_interrupts_sec_gpio_4_IRQn,
+    ioss_interrupts_sec_gpio_5_IRQn,
+    ioss_interrupts_sec_gpio_6_IRQn,
+    ioss_interrupts_sec_gpio_7_IRQn,
+    ioss_interrupts_sec_gpio_8_IRQn,
+    ioss_interrupts_sec_gpio_9_IRQn,
+};
+
 /*******************************************************************************
 * Local Function Prototypes
 *******************************************************************************/
+
 /**
  * \brief Simple helper function that validates the provided NexaWattGPIOPinConfig pin configuration
  * by the HAL user. The HAL will be used by the HAL Wrappers, hence the user of the HAL implementation will be NexaWatt-IV.DC framework.
@@ -266,9 +302,112 @@ NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Pin_Toggle(const uint8
     return retRes;
 }
 
-NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Register_EXTI(const uint8 portNum, const uint8 pinNum, const NexaWattGPIOInterruptEdgeEXTI intrEdge, void (*const isrHandlerPtr)(void))
+NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Register_EXTI(const uint8 portNum, const uint8 pinNum, const NexaWattGPIOExtIRQConfig* const extiConfig)
 {
-    return NW_GPIO_FATAL_ERR;
+    NexaWattGPIOStatusResult retRes = NW_GPIO_BAD_PARAM;
+    uint32 intrEdgeConfig = NW_EXTI_DISABLE;
+    NexaWattIntrInitConfig intrInitConfig;
+    NexaWattIntrInitStatus intrInitStatus = NW_HAL_INTR_INIT_FAILED;
+
+    nw_bool gpioPinExists =
+            NexaWatt_Hal_Infineon_Cat1B_Gpio_Validate_Port_And_Pin(portNum, pinNum);
+    if ((gpioPinExists == nwTrue) &&
+        (extiConfig != NULL) &&
+        (extiConfig->intrEdge <= NW_EXTI_BOTH_EDGES) &&
+        (extiConfig->isrHandlerPtr != NULL))
+    {
+        intrEdgeConfig = interruptEdgeMap[extiConfig->intrEdge];
+        Cy_GPIO_SetInterruptEdge(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum, intrEdgeConfig);
+
+        if (extiConfig->intrEdge != NW_EXTI_DISABLE)
+        {
+            Cy_GPIO_SetInterruptMask(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum, NW_HAL_INFINEON_CAT1B_GPIO_INTR_ENABLED_MASK);
+
+            intrInitConfig.intrSource = NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_INTR_SRC(portNum);
+            intrInitConfig.intrPriority = extiConfig->intrPriority;
+            intrInitConfig.intrHandlerPtr = extiConfig->isrHandlerPtr;
+
+            intrInitStatus =
+                    NexaWatt_Hal_Infineon_Cat1B_Intr_Init(&intrInitConfig);
+            if (intrInitStatus == NW_HAL_INTR_INIT_SUCCESS)
+            {
+                NexaWatt_Hal_Infineon_Cat1B_Intr_Enable(&intrInitConfig);
+
+                retRes = NW_GPIO_SUCCESS;
+            }
+        }
+    }
+
+    return retRes;
+}
+
+NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Disable_EXTI(const uint8 portNum, const uint8 pinNum, const NexaWattGPIOExtIRQConfig* const extiConfig)
+{
+    NexaWattGPIOStatusResult retRes = NW_GPIO_BAD_PARAM;
+    NexaWattIntrInitConfig intrInitConfig;
+
+    nw_bool gpioPinExists =
+            NexaWatt_Hal_Infineon_Cat1B_Gpio_Validate_Port_And_Pin(portNum, pinNum);
+    if ((gpioPinExists == nwTrue) &&
+        (extiConfig != NULL))
+    {
+        Cy_GPIO_SetInterruptEdge(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum, CY_GPIO_INTR_DISABLE);
+        Cy_GPIO_SetInterruptMask(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum, NW_HAL_INFINEON_CAT1B_GPIO_INTR_DISABLED_MASK);
+
+        intrInitConfig.intrSource = NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_INTR_SRC(portNum);
+        intrInitConfig.intrPriority = NW_HAL_INFINEON_CAT1B_GPIO_INTR_DISABLED_MASK;
+        intrInitConfig.intrHandlerPtr = extiConfig->isrHandlerPtr;
+
+        NexaWatt_Hal_Infineon_Cat1B_Intr_Disable(&intrInitConfig);
+
+        retRes = NW_GPIO_SUCCESS;
+    }
+
+    return retRes;
+}
+
+NW_INLINE NwGpioExtiStatus NexaWatt_Hal_Infineon_Cat1B_Gpio_Get_EXTI_Status(const uint8 portNum, const uint8 pinNum)
+{
+    NwGpioExtiStatus extiStatus = nwFalse;
+    uint32 intrStatusGpio = NW_HAL_INFINEON_CAT1B_GPIO_INTR_DISABLED_MASK;
+
+    nw_bool gpioPinExists =
+            NexaWatt_Hal_Infineon_Cat1B_Gpio_Validate_Port_And_Pin(portNum, pinNum);
+    if (gpioPinExists == nwTrue)
+    {
+        intrStatusGpio =
+                Cy_GPIO_GetInterruptStatus(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum);
+        extiStatus = (intrStatusGpio == NW_HAL_INFINEON_CAT1B_GPIO_INTR_ENABLED_MASK) ?
+                nwTrue : nwFalse;
+    }
+
+    return extiStatus;
+}
+
+NW_INLINE NwGpioExtiStatus NexaWatt_Hal_Infineon_Cat1B_Gpio_Get_EXTI_Status_Unsafe(const uint8 portNum, const uint8 pinNum)
+{
+    return (NwGpioExtiStatus)Cy_GPIO_GetInterruptStatus(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum);
+}
+
+NW_INLINE NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Clear_EXTI_Status(const uint8 portNum, const uint8 pinNum)
+{
+    NexaWattGPIOStatusResult retRes = NW_GPIO_BAD_PARAM;
+
+    nw_bool gpioPinExists =
+            NexaWatt_Hal_Infineon_Cat1B_Gpio_Validate_Port_And_Pin(portNum, pinNum);
+    if (gpioPinExists == nwTrue)
+    {
+        Cy_GPIO_ClearInterrupt(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum);
+
+        retRes = NW_GPIO_SUCCESS;
+    }
+
+    return retRes;
+}
+
+NW_INLINE void NexaWatt_Hal_Infineon_Cat1B_Gpio_Clear_EXTI_Status_Unsafe(const uint8 portNum, const uint8 pinNum)
+{
+    Cy_GPIO_ClearInterrupt(NW_HAL_INFINEON_CAT1B_GPIO_GET_PORT_BASE(portNum), pinNum);
 }
 
 NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Trigger_Sw_EXTI(const uint8 portNum, const uint8 pinNum)

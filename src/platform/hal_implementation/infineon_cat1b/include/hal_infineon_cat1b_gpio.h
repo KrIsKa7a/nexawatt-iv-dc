@@ -37,6 +37,7 @@
 /*******************************************************************************
 * Function Prototypes
 *******************************************************************************/
+
 /**
  * \brief HAL function that provides GPIO pin initialization using the framework standardized
  * configuration structures and types. The function performs validation of the provided pin configuration
@@ -106,7 +107,86 @@ NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Pin_Write(uint8 portNu
  */
 NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Pin_Toggle(uint8 portNum, uint8 pinNum);
 
-NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Register_EXTI(uint8 portNum, uint8 pinNum, NexaWattGPIOInterruptEdgeEXTI intrEdge, void (*isrHandlerPtr)(void));
+/**
+ * \brief HAL function that can be used to initialize and enable an External Interrupt Request from a GPIO input pin.
+ * The function performs a validation for the existence of the provided combination of GPIO port and pin numbers for Infineon CAT1B devices.
+ * Furthermore, the functions is also performing a validation of the provided NexaWattGPIOExtIRQConfig External IRQ Configuration.
+ * If validation passes, the configured External IRQ is initialized and enabled automatically. In case the Interrupt Request needs to be disabled,
+ * the user is free to use both CMSIS core function or the provided NexaWatt_Hal_Infineon_Cat1B_Gpio_Disable_EXTI() function.
+ * \param portNum - The number of the desired GPIO port for the operation.
+ * \param pinNum - The number of the desired GPIO pin to be configured as External IRQ source.
+ * \param extiConfig - A pointer, containing the framework's standardized GPIO External Interrupt Request configuration.
+ * \return NW_GPIO_BAD_PARAM - The validation of the provided configuration failed. Please make sure that the combination of the port and pin number represents existing pin of the Infineon CAT1B devices.
+ * Validate that the provided GPIO External Interrupt Request configuration is valid.
+ * \return NW_GPIO_SUCCESS - The provided External Interrupt Request source is initialized and enabled.
+ */
+NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Register_EXTI(uint8 portNum, uint8 pinNum, const NexaWattGPIOExtIRQConfig* extiConfig);
+
+/**
+ * \brief HAL function that can be used to disable an already initialized and enabled External Interrupt Request from a GPIO input pin.
+ * The function performs a validation for the existence of the provided combination of GPIO port and pin numbers for Infineon CAT1B devices.
+ * Furthermore, the functions is also performing a validation of the provided NexaWattGPIOExtIRQConfig External IRQ Configuration.
+ * If validation passes, the configured External IRQ is disabled.
+ * Please make sure to provide the NexaWattGPIOExtIRQConfig used for the initialization of the External Interrupt Request
+ * or equivalent copy.
+ * \param portNum - The number of the desired GPIO port for the operation.
+ * \param pinNum - The number of the desired GPIO pin to be disabled from the External IRQ sources.
+ * \param extiConfig - A pointer, containing the framework's standardized GPIO External Interrupt Request configuration.
+ * \return NW_GPIO_BAD_PARAM - The validation of the provided configuration failed. Please make sure that the combination of the port and pin number represents existing pin of the Infineon CAT1B devices.
+ * Validate that the provided GPIO External Interrupt Request configuration is valid.
+ * \return NW_GPIO_SUCCESS - The provided External Interrupt Request source is disabled.
+ */
+NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Disable_EXTI(uint8 portNum, uint8 pinNum, const NexaWattGPIOExtIRQConfig* extiConfig);
+
+/**
+ * \brief HAL function that can be used to check the status of an External Interrupt Request.
+ * Note that the provided GPIO pin must be configured as an EXTI request for this function to work.
+ * The function is also performing a validation for the existence of the provided combination of GPIO port and pin number for Infineon CAT1B devices.
+ * \Note In many cases, the System Interrupt needs to be serviced as fast as possible in the ISR.
+ * In these cases, the validation of the provided GPIO port and pin numbers may introduce undesirable overhead and loss of performance.
+ * To deal with such situations, unsafe version of this function is provided.
+ * \param portNum - The number of the desired GPIO port for the operation.
+ * \param pinNum - The number of the desired GPIO pin for which the EXTI request status will be returned.
+ * \return nwFalse - The EXTI request is not raised or the provided combination of GPIO port and pin is not existing.
+ * \return nwTrue - The EXTI request is raised and waiting to be processed by application.
+ */
+NwGpioExtiStatus NexaWatt_Hal_Infineon_Cat1B_Gpio_Get_EXTI_Status(uint8 portNum, uint8 pinNum);
+
+/**
+ * \brief HAL function that can be used to check the status of an External Interrupt Request.
+ * Note that the provided GPIO pin must be configured as an EXTI request for this function to work.
+ * \Note In many cases, the System Interrupt needs to be serviced as fast as possible in the ISR.
+ * This function is not performing any validation of the provided GPIO port and pin numbers to reduce overhead in the ISRs.
+ * \param portNum - The number of the desired GPIO port for the operation.
+ * \param pinNum - The number of the desired GPIO pin for which the EXTI request status will be returned.
+ * \return nwFalse - The EXTI request is not raised.
+ * \return nwTrue - The EXTI request is raised and waiting to be processed by application.
+ */
+NwGpioExtiStatus NexaWatt_Hal_Infineon_Cat1B_Gpio_Get_EXTI_Status_Unsafe(uint8 portNum, uint8 pinNum);
+
+/**
+ * \brief HAL function that can be used to clear the status of an External Interrupt Request.
+ * Note that the provided GPIO pin must be configured as an EXTI request for this function to work.
+ * The function is also performing a validation for the existence of the provided combination of GPIO port and pin number for Infineon CAT1B devices.
+ * \Note In many cases, the System Interrupt needs to be serviced as fast as possible in the ISR.
+ * In these cases, the validation of the provided GPIO port and pin numbers may introduce undesirable overhead and loss of performance.
+ * To deal with such situations, unsafe version of this function is provided.
+ * \param portNum - The number of the desired GPIO port for the operation.
+ * \param pinNum - The number of the desired GPIO pin for which the EXTI request status will be cleared.
+ * \return NW_GPIO_BAD_PARAM - The provided combination of GPIO port and pin number is not existing for Infineon CAT1B devices.
+ * \return NW_GPIO_SUCCESS - The EXTI request status is cleared.
+ */
+NexaWattGPIOStatusResult NexaWatt_Hal_Infineon_Cat1B_Gpio_Clear_EXTI_Status(uint8 portNum, uint8 pinNum);
+
+/**
+ * \brief HAL function that can be used to clear the status of an External Interrupt Request.
+ * Note that the provided GPIO pin must be configured as an EXTI request for this function to work.
+ * \Note In many cases, the System Interrupt needs to be serviced as fast as possible in the ISR.
+ * This function is not performing any validation of the provided GPIO port and pin numbers to reduce overhead in the ISRs.
+ * \param portNum - The number of the desired GPIO port for the operation.
+ * \param pinNum - The number of the desired GPIO pin for which the EXTI request status will be cleared.
+ */
+void NexaWatt_Hal_Infineon_Cat1B_Gpio_Clear_EXTI_Status_Unsafe(uint8 portNum, uint8 pinNum);
 
 /**
  * \brief HAL function that can be used to perform SW triggering of an already

@@ -68,12 +68,12 @@
  * and that the provided Interrupt Source Number and Priority are valid up to the defined limits for Infineon CAT1B devices.
  * \return nwTrue - The provided Interrupt Source configuration is valid.
  */
-NW_LOCAL_INLINE nw_bool ValidateInterruptConfiguration(NexaWattIntrInitConfig* intrConfig);
+NW_LOCAL_INLINE nw_bool ValidateInterruptConfiguration(const NexaWattIntrInitConfig* intrConfig);
 
 /*******************************************************************************
 * Function Definitions
 *******************************************************************************/
-NexaWattIntrInitStatus NexaWatt_Hal_Infineon_Cat1B_Intr_Init(NexaWattIntrInitConfig* intrConfig)
+NexaWattIntrInitStatus NexaWatt_Hal_Infineon_Cat1B_Intr_Init(const NexaWattIntrInitConfig* const intrConfig)
 {
     NexaWattIntrInitStatus retRes = NW_HAL_INTR_INIT_FAILED;
     cy_en_sysint_status_t intrInitResult = CY_SYSINT_BAD_PARAM;
@@ -83,7 +83,7 @@ NexaWattIntrInitStatus NexaWatt_Hal_Infineon_Cat1B_Intr_Init(NexaWattIntrInitCon
     if (intrConfigValidationResult == nwTrue)
     {
         userIntrConfig.intrSrc = intrConfig->intrSource;
-        userIntrConfig.intrPriority = intrConfig->intrPriority;
+        userIntrConfig.intrPriority = (uint32)intrConfig->intrPriority;
 
         intrInitResult = Cy_SysInt_Init(&userIntrConfig, intrConfig->intrHandlerPtr);
         if (intrInitResult == CY_SYSINT_SUCCESS)
@@ -96,7 +96,7 @@ NexaWattIntrInitStatus NexaWatt_Hal_Infineon_Cat1B_Intr_Init(NexaWattIntrInitCon
     return retRes;
 }
 
-void NexaWatt_Hal_Infineon_Cat1B_Intr_Enable(NexaWattIntrInitConfig* intrConfig)
+void NexaWatt_Hal_Infineon_Cat1B_Intr_Enable(const NexaWattIntrInitConfig* const intrConfig)
 {
     nw_bool intrConfigValidationResult = ValidateInterruptConfiguration(intrConfig);
     if (intrConfigValidationResult == nwTrue)
@@ -105,7 +105,7 @@ void NexaWatt_Hal_Infineon_Cat1B_Intr_Enable(NexaWattIntrInitConfig* intrConfig)
     }
 }
 
-void NexaWatt_Hal_Infineon_Cat1B_Intr_Disable(NexaWattIntrInitConfig* intrConfig)
+void NexaWatt_Hal_Infineon_Cat1B_Intr_Disable(const NexaWattIntrInitConfig* const intrConfig)
 {
     nw_bool intrConfigValidationResult = ValidateInterruptConfiguration(intrConfig);
     if (intrConfigValidationResult == nwTrue)
@@ -114,7 +114,7 @@ void NexaWatt_Hal_Infineon_Cat1B_Intr_Disable(NexaWattIntrInitConfig* intrConfig
     }
 }
 
-NW_LOCAL_INLINE nw_bool ValidateInterruptConfiguration(NexaWattIntrInitConfig* intrConfig)
+NW_LOCAL_INLINE nw_bool ValidateInterruptConfiguration(const NexaWattIntrInitConfig* const intrConfig)
 {
     nw_bool validationResult = nwTrue;
     if (intrConfig == NULL)
