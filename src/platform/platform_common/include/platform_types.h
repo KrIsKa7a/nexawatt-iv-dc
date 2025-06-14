@@ -26,8 +26,6 @@
 #define nwFalse             (0u != 0u)
 #define nwTrue              (0u == 0u)
 
-#define NwIsrPointerType(arg)    (void (*arg)(void))
-
 /*******************************************************************************
 * Type definitions
 *******************************************************************************/
@@ -44,6 +42,8 @@ typedef uint8_t nw_bool;
 typedef nw_bool NwGpioPinResult;
 typedef uint16 NwGpioPinAltFunction;
 typedef uint32 NwInterruptMask;
+
+typedef void(*NwIsrPointerType)(void);
 
 typedef enum eNexaWattGPIOPinDirection
 {
@@ -99,6 +99,19 @@ typedef enum eNexaWattGPIOInterruptEdgeEXTI
     NW_EXTI_FALLING_EDGE    = 0x02u,
     NW_EXTI_BOTH_EDGES      = 0x03u,
 } NexaWattGPIOInterruptEdgeEXTI;
+
+typedef enum eNexaWattIntrInitStatus
+{
+    NW_HAL_INTR_INIT_SUCCESS = 0x00u,
+    NW_HAL_INTR_INIT_FAILED = 0x01u,
+} NexaWattIntrInitStatus;
+
+typedef struct sNexaWattIntrInitConfig
+{
+    uint32 intrSource;
+    uint32 intrPriority;
+    NwIsrPointerType intrHandlerPtr;
+} NexaWattIntrInitConfig;
 
 typedef enum eNexaWattHalContextInitFunctionTypes
 {
