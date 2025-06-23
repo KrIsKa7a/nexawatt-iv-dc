@@ -143,3 +143,10 @@ ehthumbs_vista.db
 
 dkms.conf
 mtb_shared/**
+
+# CLion Project Config
+.idea/*
+
+# CMake Build
+cmake-build-*/*
+CMakeLists.txt
