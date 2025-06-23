@@ -14,14 +14,18 @@
 /*******************************************************************************
 * Header Files
 *******************************************************************************/
-#include <stdint.h>
+#include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 
 /*******************************************************************************
 * Macros
 *******************************************************************************/
 #define NW_INLINE           inline
 #define NW_LOCAL_INLINE     static inline
+
+#define NW_ASSERT(expr)     assert(expr)
+#define NW_DUMMY()          asm("nop")
 
 #define nwFalse             (0u != 0u)
 #define nwTrue              (0u == 0u)
@@ -44,6 +48,7 @@ typedef uint16 NwGpioPinAltFunction;
 typedef nw_bool NwGpioExtiStatus;
 typedef uint32 NwInterruptMask;
 typedef uint32 NwInterruptPriority;
+typedef uint32 NwGenericReturnType;
 
 typedef void(*NwIsrPointerType)(void);
 
